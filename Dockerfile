@@ -1,5 +1,8 @@
 FROM ubuntu:22.04
 
+# Set DEBIAN_FRONTEND to noninteractive for the entire build process
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     qgis \
@@ -10,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     sssd-ldap \
     sudo \
     vim \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user (recommended for security)

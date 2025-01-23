@@ -16,7 +16,15 @@ chown -R $USER:$USER data log # Replace with your user if needed
 
 # Build and run Docker Compose
 docker-compose build
-docker-compose up -d
+# Choose one of the following options:
+# Option 1: Run with self-signed certificates
+# docker-compose up -d self-signed-cert nginx qgis filebrowser
+
+# Option 2: Run with Certbot for a registered domain
+# docker-compose up -d certbot-fqdn nginx qgis filebrowser
+
+# Option 3: Run with Certbot for DuckDNS
+docker-compose up -d certbot-duckdns nginx qgis filebrowser
 
 echo "Setup completed. Services are running in the background."
 echo "Access QGIS at https://<your_domain_or_ip>"
