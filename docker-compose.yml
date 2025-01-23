@@ -81,12 +81,12 @@ services:
     container_name: certbot-duckdns
     volumes:
       - ${PWD}/data/certbot/conf:/etc/letsencrypt
-      - ${PWD}/certbot:/etc/certbot
+      - ${PWD}/certbot:/etc/certbot # Mount for duckdns.ini
     environment:
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
     depends_on:
       - nginx
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot --webroot-path=/var/www/certbot --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --manual-public-ip-logging-ok --manual-auth-hook \"./certbot/duckdns.sh renew\" --manual-cleanup-hook \"./certbot/duckdns.sh cleanup\" -d ${DUCKDNS_DOMAIN} || exit 1; sleep 12h & wait $${!}; done;'"
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot --webroot-path=/var/www/certbot --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --manual-public-ip-logging-ok --manual-auth-hook \"./certbot/duckdns.sh renew\" --manual-cleanup-hook \"./certbot/duckdns.sh cleanup\" --deploy-hook \"docker exec -it nginx-proxy nginx -s reload\" -d ${DUCKDNS_DOMAIN} || exit 1; sleep 12h & wait $${!}; done;'"
     networks:
       - qgis-network
 

@@ -1,3 +1,4 @@
+```
 qgis-docker/
 ├── data/
 │   └── storage/  # Your persistent QGIS data directory
@@ -7,7 +8,7 @@ qgis-docker/
 │   └── database.db # File Browser database (optional, can be a volume)
 ├── certbot/        # Directory for certbot configurations
 │   ├── duckdns.ini # DuckDNS credentials
-│   └── ...         # Other certbot config files
+│   └── duckdns.sh # DuckDNS hook script
 ├── xpra/
 │   └── xpra.conf   # Xpra configuration file
 ├── scripts/
@@ -24,3 +25,4 @@ qgis-docker/
     ├── qgis.log
     ├── nginx.log
     └── filebrowser.log
+```

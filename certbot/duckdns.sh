@@ -1,7 +1,15 @@
 #!/bin/bash
 
+# DuckDNS API credentials (now read from duckdns.ini)
+DUCKDNS_TOKEN=$(grep dns_duckdns_token /etc/certbot/duckdns.ini | cut -d '=' -f2 | tr -d ' ')
+
+if [ -z "$DUCKDNS_TOKEN" ]; then
+  echo "Error: DuckDNS token not found in duckdns.ini."
+  exit 1
+fi
+
 # DuckDNS API credentials (replace with your actual token)
-DUCKDNS_TOKEN="YOUR_DUCKDNS_TOKEN"
+#DUCKDNS_TOKEN="YOUR_DUCKDNS_TOKEN"
 
 if [ "$CERTBOT_VALIDATION" = "" ]; then
   echo "Error: CERTBOT_VALIDATION environment variable not set."
