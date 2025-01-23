@@ -10,7 +10,7 @@ log/*
 
 # Docker #
 ##########
-#.env
+.env
 data/
 filebrowser/
 certbot/
