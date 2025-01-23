@@ -1,0 +1,21 @@
+# OS generated files #
+######################
+.DS_Store
+Thumbs.db
+
+# Logs #
+########
+log/*
+*.log
+
+# Docker #
+##########
+#.env
+data/
+filebrowser/
+certbot/
+
+# IDE specific files #
+######################
+.idea/
+*.iml

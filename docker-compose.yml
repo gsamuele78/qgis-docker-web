@@ -1,0 +1,106 @@
+version: '3.7'
+
+services:
+  qgis:
+    build: .
+    container_name: qgis-container
+    restart: unless-stopped
+    environment:
+      - QGIS_USER_UID=${QGIS_USER_UID}
+      - QGIS_USER_GID=${QGIS_USER_GID}
+      - XPRA_PASSWORD=${XPRA_PASSWORD} # Add password option for Xpra
+    volumes:
+      - /etc/sssd:/etc/sssd:ro
+      - /var/lib/sss:/var/lib/sss:ro
+      - /etc/nsswitch.conf:/etc/nsswitch.conf:ro
+      - /etc/pam.d:/etc/pam.d:ro
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
+      - ${PWD}/data/storage:${QGIS_DATA_DIR}
+      - ${PWD}/log/qgis.log:/var/log/xpra.log
+    tmpfs:
+      - /run:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID}
+      - /tmp:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID}
+    user: "${QGIS_USER_UID}:${QGIS_USER_GID}"
+    ports:
+      - "${XPRA_PORT}:${XPRA_PORT}"
+    networks:
+      - qgis-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${PWD}/log/nginx.log:/var/log/nginx/access.log
+      - ${PWD}/data/certbot/conf:/etc/letsencrypt # Mount Certbot data
+      - ${PWD}/data/certbot/www:/var/www/certbot # Mount Certbot webroot
+    ports:
+      - "${NGINX_PORT}:80"
+      - "${NGINX_HTTPS_PORT}:443" # Add HTTPS port
+    depends_on:
+      - qgis
+      - filebrowser
+    networks:
+      - qgis-network
+
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser-container
+    restart: unless-stopped
+    environment:
+      - FB_BASEURL=${FILEBROWSER_BASE_URL}
+      - FB_DATABASE=/database/database.db
+    volumes:
+      - ${PWD}/data/storage:${QGIS_DATA_DIR}
+      - ${PWD}/filebrowser:/database
+      - /etc/sssd:/etc/sssd:ro
+      - /var/lib/sss:/var/lib/sss:ro
+      - /etc/nsswitch.conf:/etc/nsswitch.conf:ro
+      - /etc/pam.d:/etc/pam.d:ro
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
+      - ${PWD}/log/filebrowser.log:/var/log/filebrowser.log
+    user: "${QGIS_USER_UID}:${QGIS_USER_GID}"
+    networks:
+      - qgis-network
+
+  certbot-fqdn:
+    image: certbot/certbot:latest
+    container_name: certbot-fqdn
+    volumes:
+      - ${PWD}/data/certbot/conf:/etc/letsencrypt
+      - ${PWD}/data/certbot/www:/var/www/certbot
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/www/certbot --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email -d ${DOMAIN_NAME} # For registered domain
+    networks:
+      - qgis-network
+
+  certbot-duckdns:
+    image: certbot/certbot:latest
+    container_name: certbot-duckdns
+    volumes:
+      - ${PWD}/data/certbot/conf:/etc/letsencrypt
+      - ${PWD}/certbot:/etc/certbot
+    environment:
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+    depends_on:
+      - nginx
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot --webroot-path=/var/www/certbot --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --manual-public-ip-logging-ok --manual-auth-hook \"./certbot/duckdns.sh renew\" --manual-cleanup-hook \"./certbot/duckdns.sh cleanup\" -d ${DUCKDNS_DOMAIN} || exit 1; sleep 12h & wait $${!}; done;'"
+    networks:
+      - qgis-network
+
+  self-signed-cert:
+    image: alpine
+    container_name: self-signed-cert
+    volumes:
+      - ${PWD}/data/certbot/conf:/etc/ssl/certs
+    command: >
+      sh -c "apk add --no-cache openssl &&
+      openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj \"/C=US/ST=Denial/L=Springfield/O=Dis/CN=${DOMAIN_NAME}\" -keyout /etc/ssl/certs/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt"
+    networks:
+      - qgis-network
+
+networks:
+  qgis-network:
+    driver: bridge
