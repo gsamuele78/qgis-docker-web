@@ -91,13 +91,12 @@ services:
       - qgis-network
 
   self-signed-cert:
-    image: alpine
+    image: paulczar/omgwtfssl
     container_name: self-signed-cert
+    environment:
+      - SSL_SUBJECT="example.com"
     volumes:
-      - ${PWD}/data/certbot/conf:/etc/ssl/certs
-    command: >
-      sh -c "apk add --no-cache openssl &&
-      openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj \"/C=US/ST=Denial/L=Springfield/O=Dis/CN=${DOMAIN_NAME}\" -keyout /etc/ssl/certs/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt"
+      - ${PWD}/data/certbot/conf:/certs
     networks:
       - qgis-network
 
