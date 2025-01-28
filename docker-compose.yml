@@ -2,27 +2,24 @@ version: '3.7'
 
 services:
   qgis:
-    build: .
+    build:
+      context: .
+      args:
+        - QGIS_USER_UID
+        - QGIS_USER_GID
     container_name: qgis-container
     restart: unless-stopped
     environment:
-      - QGIS_USER_UID=${QGIS_USER_UID}
-      - QGIS_USER_GID=${QGIS_USER_GID}
-      - XPRA_PASSWORD=${XPRA_PASSWORD} # Add password option for Xpra
+      - XPRA_PASSWORD=${XPRA_PASSWORD}
     volumes:
-      - /etc/sssd:/etc/sssd:ro
-      - /var/lib/sss:/var/lib/sss:ro
-      - /etc/nsswitch.conf:/etc/nsswitch.conf:ro
-      - /etc/pam.d:/etc/pam.d:ro
-      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
-      - ${PWD}/data/storage:${QGIS_DATA_DIR}
-      - ${PWD}/log/qgis.log:/var/log/xpra.log
+      - ./data/storage:${QGIS_DATA_DIR}
+      - ./log/qgis/xpra:/var/log/xpra
     tmpfs:
-      - /run:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID}
-      - /tmp:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID}
+      - /run:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID},mode=700
+      - /tmp:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID},mode=1777
     user: "${QGIS_USER_UID}:${QGIS_USER_GID}"
     ports:
-      - "${XPRA_PORT}:${XPRA_PORT}"
+      - "${XPRA_PORT}:14500"
     networks:
       - qgis-network
 
@@ -33,10 +30,14 @@ services:
     volumes:
       - ${PWD}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ${PWD}/log/nginx.log:/var/log/nginx/access.log
+      - ${PWD}/nginx/ssl:/etc/nginx/ssl:ro
+      - ${PWD}/nginx/ssl:/etc/nginx/ssl:ro
+      - ${PWD}/nginx/ssl:/etc/nginx/ssl:ro
       - ${PWD}/data/certbot/conf:/etc/letsencrypt # Mount Certbot data
       - ${PWD}/data/certbot/www:/var/www/certbot # Mount Certbot webroot
     ports:
-      - "${NGINX_PORT}:80"
+      - "${NGINX_PORT}:443"
+      - "80:80"
       - "${NGINX_HTTPS_PORT}:443" # Add HTTPS port
     depends_on:
       - qgis

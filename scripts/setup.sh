@@ -110,7 +110,7 @@ select ssl_type in "Let's Encrypt (Certbot)" "DuckDNS (Certbot)" "Self-Signed"; 
 done
 
 # --- Build and Run Docker Compose ---
-docker-compose build
-docker-compose up -d
+docker compose build --no-cache
+docker compose up 
 
 echo "Setup complete!"
