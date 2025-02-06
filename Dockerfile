@@ -36,6 +36,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     mesa-utils \
     && rm -rf /var/lib/apt/lists/*
 
+#Fix Dbus and Python Module Errors
+RUN apt-get update && apt-get install -y \
+    dbus \
+    dbus-x11 \
+    xdg-utils \
+    python3-dbus \
+    python3-gst-1.0 \
+    python3-zeroconf \
+    python3-xdg \
+    fuse3 \
+    libfuse3-3 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Configure QGIS repository
 RUN mkdir -p /etc/apt/keyrings && \
     wget -qO /etc/apt/keyrings/qgis-archive-keyring.gpg \
@@ -57,26 +71,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xpra-html5 \
     python3-pip \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-#Fix Dbus and Python Module Errors
-RUN apt-get update && apt-get install -y \
-    dbus \
-    dbus-x11 \
-    xdg-utils \
-    python3-dbus \
-    python3-gst-1.0 \
-    python3-zeroconf \
-    python3-xdg \
-    && apt-get clean \
+    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure runtime environment
 RUN mkdir -p \
     /tmp/.X11-unix \
     /run/user/${QGIS_USER_UID}/xpra \
-    && chmod 1777 /tmp/.X11-unix \
-    && chown -R qgisuser:qgisuser /run/user/${QGIS_USER_UID}
+    #&& chmod 1777 /tmp/.X11-unix \
+    && chmod 1700 /tmp/.X11-unix \
+    && chown -R qgisuser:qgisuser /run/user/${QGIS_USER_UID} \
+    && chown -R root:root /tmp/.X11-unix
+
+# File transfer directories
+RUN mkdir -p /home/qgisuser/uploads /home/qgisuser/downloads \
+    && chown -R qgisuser:qgisuser /home/qgisuser \
+    && chmod 700 /home/qgisuser/uploads /home/qgisuser/downloads
+
 
 # Fix runtime directory permissions
 RUN mkdir -p /run/user/${QGIS_USER_UID} && \
@@ -85,7 +96,7 @@ RUN mkdir -p /run/user/${QGIS_USER_UID} && \
 
 # Create Xpra socket directory
 RUN mkdir -p /run/xpra && \
-    chmod 755 /run/xpra
+    chmod 700 /run/xpra
 
 # Copy startup script
 COPY xpra/start-xpra.sh /usr/local/bin/
@@ -98,7 +109,9 @@ COPY xpra/xpra.conf /etc/xpra/xpra.conf
 USER qgisuser
 ENV LIBGL_ALWAYS_SOFTWARE=1 \
     XDG_RUNTIME_DIR=/run/user/${QGIS_USER_UID} \
-    DISPLAY=:99
+    DISPLAY=:99 \
+    QGIS_UPLOAD_DIR=/home/qgisuser/uploads \
+    QGIS_DOWNLOAD_DIR=/home/qgisuser/downloads
 
 EXPOSE 14500
 CMD ["/usr/local/bin/start-xpra.sh"]

@@ -11,15 +11,21 @@ services:
     restart: unless-stopped
     environment:
       - XPRA_PASSWORD=${XPRA_PASSWORD}
+      - XPRA_UPLOAD_LIMIT=${XPRA_UPLOAD_LIMIT}
+      - XPRA_FILE_SIZE_LIMIT=${XPRA_FILE_SIZE_LIMIT}
+      - QGIS_DATA_DIR=${QGIS_DATA_DIR}  
     volumes:
       - ./data/storage:${QGIS_DATA_DIR}
-      - ./log/qgis/xpra:/var/log/xpra
+      - ./data/storage/uploads:/home/qgisuser/uploads
+      - ./data/storage/downloads:/home/qgisuser/downloads
+      - ./log/qgis/xpra:/var/log
     tmpfs:
       - /run:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID},mode=700
-      - /tmp:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID},mode=1777
+      - /tmp
     user: "${QGIS_USER_UID}:${QGIS_USER_GID}"
     ports:
       - "${XPRA_PORT}:14500"
+    tty: true      
     networks:
       - qgis-network
 

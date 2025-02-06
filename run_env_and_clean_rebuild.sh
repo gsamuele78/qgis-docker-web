@@ -19,13 +19,13 @@ export QGIS_DATA_DIR=/home/qgisuser/projects
 
 
 # Stop and remove all containers
-#docker compose down --rmi all --volumes --remove-orphans
+docker compose down --rmi all --volumes --remove-orphans
 
 # Remove all unused Docker objects
-#docker system prune -a --volumes --force
+docker system prune -a --volumes --force
 
 # Remove specific leftover files (if needed)
-#sudo rm -rf ./data/storage/* ./log/*
+sudo rm -rf ./data/storage/* ./log/*
 
 # Check build context and Dockerfile location
 docker compose config | grep -A5 'build:'

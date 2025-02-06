@@ -66,53 +66,29 @@ XPRA_GID=$(id -g)
 ## Keep container running
 #tail -f /dev/null
 
-#Xvfb ${DISPLAY} -screen 0 1920x1080x24 -ac +extension GLX +render -noreset &
-
-#xpra start \
-#  --bind-tcp=0.0.0.0:${XPRA_PORT} \
-#  --html=on \
-#  --start-child="qgis" \
-#  --exit-with-children=yes \
-#  --file-transfer=on \
-#  --resize-display=yes \
-#  --dbus-control=yes \
-#  --headerbar=auto \
-#  --opengl=auto \
-#  --pulseaudio=no \
-#  --audio=no \
-#  --mdns=no \
-#  --webcam=no \
-#  --notifications=no \
-#  --socket-dirs=/run/user/${QGIS_USER_UID}/xpra \
-#  --clipboard=yes \
-#  --auth=file:filename=${XPRA_PASSWORD_FILE:-/dev/null} \
-#  --daemon=no \
-#  --uid=${XPRA_UID} \
-#  --gid=${XPRA_GID} \
-#  2> >(grep -vE "Could not resolve keysym|ZINK" >&2)
-#
-#tail -f /dev/null
-#
 Xvfb ${DISPLAY} -screen 0 1920x1080x24 -ac +extension GLX +render -noreset &
 
 xpra start \
   --bind-tcp=0.0.0.0:${XPRA_PORT} \
   --html=on \
-  --start-child="dbus-launch qgis" \
+  --start-child="qgis" \
   --exit-with-children=yes \
   --file-transfer=on \
   --resize-display=yes \
-  --desktop-scaling=auto \
   --dbus-control=yes \
+  --headerbar=auto \
+  --opengl=auto \
   --pulseaudio=no \
   --audio=no \
   --mdns=no \
   --webcam=no \
   --notifications=no \
-  --socket-dirs=/run/user/xpra \
+  --socket-dirs=/run/user/${QGIS_USER_UID}/xpra \
   --clipboard=yes \
   --auth=file:filename=${XPRA_PASSWORD_FILE:-/dev/null} \
   --daemon=no \
+  --uid=${XPRA_UID} \
+  --gid=${XPRA_GID} \
   2> >(grep -vE "Could not resolve keysym|ZINK" >&2)
 
 tail -f /dev/null
