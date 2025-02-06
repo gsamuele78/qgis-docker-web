@@ -93,6 +93,7 @@ XPRA_GID=$(id -g)
 #
 #tail -f /dev/null
 #
+echo ${XPRA_PASSWORD}
 Xvfb ${DISPLAY} -screen 0 1920x1080x24 -ac +extension GLX +render -noreset &
 
 xpra start \
@@ -111,7 +112,7 @@ xpra start \
   --notifications=no \
   --socket-dirs=/run/user/xpra \
   --clipboard=yes \
-  --auth=file:filename=${XPRA_PASSWORD_FILE:-/dev/null} \
+  --auth=env:name=${XPRA_PASSWORD} \
   --daemon=no \
   2> >(grep -vE "Could not resolve keysym|ZINK" >&2)
 
