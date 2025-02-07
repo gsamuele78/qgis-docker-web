@@ -10,14 +10,13 @@ services:
     container_name: qgis-container
     restart: unless-stopped
     environment:
+      - QGIS_USER_UID=${QGIS_USER_UID}
+      - QGIS_USER_GID=${QGIS_USER_GID}
       - XPRA_PASSWORD=${XPRA_PASSWORD}
-      - XPRA_UPLOAD_LIMIT=${XPRA_UPLOAD_LIMIT}
-      - XPRA_FILE_SIZE_LIMIT=${XPRA_FILE_SIZE_LIMIT}
       - QGIS_DATA_DIR=${QGIS_DATA_DIR}  
     volumes:
       - ./data/storage:${QGIS_DATA_DIR}
-      - ./data/storage/uploads:/home/qgisuser/uploads
-      - ./data/storage/downloads:/home/qgisuser/downloads
+      - ./config/qgis:/etc/xpra  
       - ./log/qgis-xpra:/var/log
     tmpfs:
       - /run:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID},mode=700
