@@ -110,7 +110,7 @@ xpra start \
   --mdns=no \
   --webcam=no \
   --notifications=no \
-  --socket-dirs=/run/user/xpra \
+  --socket-dirs=/run/user/${QGIS_USER_UID}/xpra \
   --clipboard=yes \
   --auth=env:name=${XPRA_PASSWORD} \
   --daemon=no \

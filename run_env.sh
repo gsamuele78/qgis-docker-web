@@ -19,13 +19,13 @@ export QGIS_DATA_DIR=/home/qgisuser/projects
 
 
 # Stop and remove all containers
-#docker compose down --rmi all --volumes --remove-orphans
+docker compose down --rmi all --volumes --remove-orphans
 
 # Remove all unused Docker objects
-#docker system prune -a --volumes --force
+docker system prune -a --volumes --force
 
 # Remove specific leftover files (if needed)
-#sudo rm -rf ./data/storage/* ./log/*
+sudo rm -rf ./data/storage/* ./log/*
 
 # Check build context and Dockerfile location
 docker compose config | grep -A5 'build:'
@@ -35,9 +35,10 @@ docker compose config | grep -A5 'build:'
 #         dockerfile: Dockerfile
 
 #Create required directories on host
-mkdir -p data/storage log
-mkdir -p data/storage/{uploads,downloads} 
-sudo chown -R ${BASE_UID}:${BASE_GID}  data
+mkdir -p data/storage log data/filebrowser
+#mkdir -p data/storage/{uploads,downloads} 
+sudo chown -R ${BASE_UID}:${BASE_GID}  data log
 # Build and run
-docker compose build --no-cache qgis
-docker compose up qgis
+#docker compose build --no-cache qgis
+docker compose build --no-cache filebrowser
+docker compose up filebrowser

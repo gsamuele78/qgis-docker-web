@@ -18,7 +18,7 @@ services:
       - ./data/storage:${QGIS_DATA_DIR}
       - ./data/storage/uploads:/home/qgisuser/uploads
       - ./data/storage/downloads:/home/qgisuser/downloads
-      - ./log/qgis/xpra:/var/log
+      - ./log/qgis-xpra:/var/log
     tmpfs:
       - /run:uid=${QGIS_USER_UID},gid=${QGIS_USER_GID},mode=700
       - /tmp
@@ -59,15 +59,13 @@ services:
       - FB_BASEURL=${FILEBROWSER_BASE_URL}
       - FB_DATABASE=/database/database.db
     volumes:
-      - ${PWD}/data/storage:${QGIS_DATA_DIR}
-      - ${PWD}/filebrowser:/database
-      - /etc/sssd:/etc/sssd:ro
-      - /var/lib/sss:/var/lib/sss:ro
-      - /etc/nsswitch.conf:/etc/nsswitch.conf:ro
-      - /etc/pam.d:/etc/pam.d:ro
-      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
-      - ${PWD}/log/filebrowser.log:/var/log/filebrowser.log
+      - ./data/storage:${QGIS_DATA_DIR}
+      - ./data/filebrowser:${FB_DATABASE}
+      - ./config/filebrowser:/config  
+      - ./log/filebrowser.log:/var/log/filebrowser.log
     user: "${QGIS_USER_UID}:${QGIS_USER_GID}"
+    ports: 
+      - "443:8080"  
     networks:
       - qgis-network
 

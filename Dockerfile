@@ -17,8 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     wget \
     gnupg \
-    apt-transport-https \
-    && rm -rf /var/lib/apt/lists/*
+    apt-transport-https 
 
 # Create application user
 RUN addgroup --gid ${QGIS_USER_GID} qgisuser && \
@@ -33,8 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglx0 \
     libgl1 \
     libglu1-mesa \
-    mesa-utils \
-    && rm -rf /var/lib/apt/lists/*
+    mesa-utils 
 
 #Fix Dbus and Python Module Errors
 RUN apt-get update && apt-get install -y \
@@ -46,9 +44,7 @@ RUN apt-get update && apt-get install -y \
     python3-zeroconf \
     python3-xdg \
     fuse3 \
-    libfuse3-3 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    libfuse3-3 
 
 # Configure QGIS repository
 RUN mkdir -p /etc/apt/keyrings && \
@@ -78,21 +74,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mkdir -p \
     /tmp/.X11-unix \
     /run/user/${QGIS_USER_UID}/xpra \
-    #&& chmod 1777 /tmp/.X11-unix \
     && chmod 1700 /tmp/.X11-unix \
+    && chmod -R 700 /run/user/${QGIS_USER_UID} \
     && chown -R qgisuser:qgisuser /run/user/${QGIS_USER_UID} \
     && chown -R root:root /tmp/.X11-unix
-
-# File transfer directories
-RUN mkdir -p /home/qgisuser/uploads /home/qgisuser/downloads \
-    && chown -R qgisuser:qgisuser /home/qgisuser \
-    && chmod 700 /home/qgisuser/uploads /home/qgisuser/downloads
-
-
-# Fix runtime directory permissions
-RUN mkdir -p /run/user/${QGIS_USER_UID} && \
-    chmod 700 /run/user/${QGIS_USER_UID} && \
-    chown qgisuser:qgisuser /run/user/${QGIS_USER_UID}
 
 # Create Xpra socket directory
 RUN mkdir -p /run/xpra && \

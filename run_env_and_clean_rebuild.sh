@@ -36,8 +36,8 @@ docker compose config | grep -A5 'build:'
 
 #Create required directories on host
 mkdir -p data/storage log
-mkdir -p data/storage/{uploads,downloads} 
-sudo chown -R ${BASE_UID}:${BASE_GID}  data
+#mkdir -p data/storage/{uploads,downloads} 
+sudo chown -R ${BASE_UID}:${BASE_GID}  data log
 # Build and run
 docker compose build --no-cache qgis
-docker compose up qgis
+docker compose up qgis filebrowser
