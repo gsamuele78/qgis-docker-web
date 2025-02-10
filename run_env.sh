@@ -34,7 +34,8 @@ docker compose down --rmi all --volumes --remove-orphans
 docker system prune -a --volumes --force
 
 # Remove specific leftover files (if needed)
-sudo rm -rf ./data/storage/* ./log/* ./config/*
+#sudo rm -rf ./data/* ./log/* ./config/*
+sudo rm -rf ./data/* ./logs/* 
 
 # Check build context and Dockerfile location
 docker compose config | grep -A5 'build:'
@@ -44,12 +45,25 @@ docker compose config | grep -A5 'build:'
 #         dockerfile: Dockerfile
 
 #Create required directories on host
-sudo rm -rf data/storage log data/filebrowser config filebrowser config
-mkdir -p ./data/storage ./log ./data/filebrowser ./config/qgis
+#sudo rm -rf data log 
+#mkdir -p ./data/storage ./log ./config/qgis ./config/filebrowser/db
+
 #mkdir -p data/storage/{uploads,downloads} 
-sudo chown -R ${BASE_UID}:${BASE_GID}  ./data ./log ./config 
+#sudo chown -R ${BASE_UID}:${BASE_GID}  ./data ./log ./config 
+
+sudo rm -rf data log logs
+mkdir -p ./data/storage ./logs/qgis ./config/qgis ./config/filebrowser/db ./logs/filebrowser
+#sudo rm -rf data log
+#mkdir -p ./data/storage ./log/filebrowser ./config/qgis ./config/filebrowser/db 
+sudo chown -R ${BASE_UID}:${BASE_GID}  ./data ./config ./.logs
+
 # Build and run
-docker compose build --no-cache qgis
-docker compose up qgis
-#docker compose build --no-cache filebrowser
-#docker compose up filebrowser
+#docker compose build --no-cache qgis
+#docker compose up qgis
+docker compose build --no-cache filebrowser qgis
+docker compose up filebrowser qgis
+
+# Create filebrowser default user
+#./build/filebrowser/create_default_user.sh
+
+

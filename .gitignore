@@ -5,16 +5,16 @@ Thumbs.db
 
 # Logs #
 ########
-log/*
-*.log
+logs/*
+*.logs
 
 # Docker #
 ##########
 .env
 data/
 nginx/ssl/
-filebrowser/
-certbot/
+#filebrowser/
+#certbot/
 #Old Conf #
 old/
 
