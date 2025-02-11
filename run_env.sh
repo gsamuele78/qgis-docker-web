@@ -45,17 +45,11 @@ docker compose config | grep -A5 'build:'
 #         dockerfile: Dockerfile
 
 #Create required directories on host
-#sudo rm -rf data log 
-#mkdir -p ./data/storage ./log ./config/qgis ./config/filebrowser/db
 
-#mkdir -p data/storage/{uploads,downloads} 
-#sudo chown -R ${BASE_UID}:${BASE_GID}  ./data ./log ./config 
-
+# Create required directories on host
 sudo rm -rf data log logs
-mkdir -p ./data/storage ./logs/qgis ./config/qgis ./config/filebrowser/db ./logs/filebrowser
-#sudo rm -rf data log
-#mkdir -p ./data/storage ./log/filebrowser ./config/qgis ./config/filebrowser/db 
-sudo chown -R ${BASE_UID}:${BASE_GID}  ./data ./config ./.logs
+mkdir -p ./data/storage ./logs/qgis-xpra ./config/qgis ./config/filebrowser/db ./logs/filebrowser ./logs/nginx ./logs/certbot-fqdn ./logs/certbot-duckdns ./logs/self-signed-cert
+sudo chown -R ${BASE_UID}:${BASE_GID}  ./data ./config ./logs
 
 # Build and run
 #docker compose build --no-cache qgis
@@ -65,5 +59,4 @@ docker compose up filebrowser qgis
 
 # Create filebrowser default user
 #./build/filebrowser/create_default_user.sh
-
 
